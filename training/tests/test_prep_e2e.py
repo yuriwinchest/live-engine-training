@@ -11,6 +11,7 @@ from conftest import CONSENT
 
 from live_lab import audio_io, report
 from live_lab.cli import main
+from live_lab.holdout import is_reserved
 from live_lab.ingest_real import ingest
 from live_lab.manifest import Split, read_manifest
 from live_lab.prep import PrepConfig, run
@@ -89,6 +90,8 @@ def test_partitions_and_negatives(workspace: Path) -> None:
                 for split in Split}  # fmt: skip
     assert not speakers[Split.TRAIN] & speakers[Split.VAL]  # SC-005
     assert not speakers[Split.TEST]
+    noisy = [e for e in examples if e.noise_source]
+    assert noisy and all(e.noise_file and not is_reserved(e.noise_file) for e in noisy)  # SC-008 da 002
 
     train = [e for e in examples if e.split is Split.TRAIN]
     share = sum(1 for e in train if e.number is None) / len(train)

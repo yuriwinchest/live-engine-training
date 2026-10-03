@@ -74,16 +74,19 @@ def _load_clips(registry: Registry, manifests: Sequence[Path]) -> list[_Located]
     return [located[key] for key in sorted(located)]
 
 
-def _noise_pools(registry: Registry, seed: int, val_fraction: float) -> dict[Split, list[tuple[str, Path]]]:
-    pools: dict[Split, list[tuple[str, Path]]] = {Split.TRAIN: [], Split.VAL: []}
+def _noise_pools(
+    registry: Registry, seed: int, val_fraction: float
+) -> dict[Split, list[tuple[str, Path, str]]]:
+    pools: dict[Split, list[tuple[str, Path, str]]] = {Split.TRAIN: [], Split.VAL: []}
     for source in registry.of_kind(SourceKind.NOISE):
         if source.path is None:
             raise ValueError(f"fonte de ruído {source.name!r} sem 'path'")
         for file in audio_io.list_audio(source.path):
-            if is_reserved(holdout_key(source.path, file)):
+            relative = holdout_key(source.path, file)
+            if is_reserved(relative):
                 continue  # reservado para a gravação real do PO: nunca entra no treino (US5 da 002)
-            key = f"{source.name}/{file.relative_to(source.path).as_posix()}"
-            pools[split_of_file(key, seed, val_fraction)].append((source.name, file))
+            key = f"{source.name}/{relative}"
+            pools[split_of_file(key, seed, val_fraction)].append((source.name, file, relative))
     return pools
 
 
@@ -125,10 +128,12 @@ class _Preparer:
             self.pools[Split.VAL] = self.pools[Split.TRAIN]
             self.notes.append("validação usa os mesmos arquivos de ruído do treino (poucos arquivos)")
 
-    def _noise(self, split: Split, seconds: float, rng: np.random.Generator) -> tuple[str, audio_io.Audio]:
+    def _noise(
+        self, split: Split, seconds: float, rng: np.random.Generator
+    ) -> tuple[str, str, audio_io.Audio]:
         pool = self.pools[Split.VAL if split is Split.VAL else Split.TRAIN]
-        name, path = pool[int(rng.integers(len(pool)))]
-        return name, audio_io.load_segment(path, seconds + 0.5, rng)
+        name, path, relative = pool[int(rng.integers(len(pool)))]
+        return name, relative, audio_io.load_segment(path, seconds + 0.5, rng)
 
     def _save(self, example: Example, signal: audio_io.Audio) -> Example:
         audio_io.save(self.config.out_dir / example.audio, signal)
@@ -143,16 +148,17 @@ class _Preparer:
         for copy in range(self.config.copies):
             rng = rng_for(seed, "augment", clip.id, copy)
             params = augment.sample_params(rng)
-            noise_name, noise = None, None
+            noise_name, noise_file, noise = None, None, None
             if params.snr_db is not None:
                 expected = (
                     audio_io.duration(signal) / params.stretch + params.pad_before_s + params.pad_after_s
                 )
-                noise_name, noise = self._noise(split, expected, rng)
+                noise_name, noise_file, noise = self._noise(split, expected, rng)
             degraded = augment.apply(signal, noise, params, rng)
             example_id = str(stable_uuid(seed, "example", clip.id, copy))
             example = _example(
                 clip, split, example_id, audio_io.duration(degraded), noise_source=noise_name,
+                noise_file=noise_file,
                 snr_level=params.snr_level,
                 snr_db=None if params.snr_db is None else round(params.snr_db, 2),
                 stretch=round(params.stretch, 4), pitch_semitones=round(params.pitch_semitones, 3),
@@ -168,7 +174,7 @@ class _Preparer:
         created = []
         for index in range(missing):
             rng = rng_for(self.config.seed, "negative", split, index)
-            noise_name, noise = self._noise(split, 3.0, rng)
+            noise_name, noise_file, noise = self._noise(split, 3.0, rng)
             signal = noise_only(noise, rng)
             example_id = str(stable_uuid(self.config.seed, "negative", split, index))
             created.append(
@@ -178,6 +184,7 @@ class _Preparer:
                         mode=Mode.NONE, source=noise_name, speaker=NOISE_SPEAKER, split=split, clean_id=None,
                         noise_source=noise_name, snr_level=SnrLevel.EXTREME, snr_db=None, stretch=1.0,
                         pitch_semitones=0.0, duration_s=round(audio_io.duration(signal), 3),
+                        noise_file=noise_file,
                     ),
                     signal,
                 )

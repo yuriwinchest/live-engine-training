@@ -66,6 +66,7 @@ class Example:
     stretch: float
     pitch_semitones: float
     duration_s: float
+    noise_file: str | None = None  # caminho relativo à fonte: permite auditar que nenhum reservado foi usado
 
 
 @dataclass(frozen=True, slots=True)

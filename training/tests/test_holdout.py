@@ -60,7 +60,7 @@ def test_prep_never_uses_reserved_files(registry_dir: Path) -> None:
     assert reserved, "fixture precisa ter ao menos um reservado"
     for seed in (0, 1, 99):
         pools = _noise_pools(registry, seed, 0.2)
-        used = {path for pool in pools.values() for _, path in pool}
+        used = {path for pool in pools.values() for _, path, _ in pool}
         assert not used & reserved
         assert used | reserved == set(audio_io.list_audio(root))
 
