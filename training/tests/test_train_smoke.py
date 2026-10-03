@@ -9,52 +9,9 @@ import pytest
 
 pytest.importorskip("torch")
 
-from live_lab import report
 from live_lab.model.network import NetConfig
-from live_lab.prep import PrepConfig, run
-from live_lab.sources import load_registry
-from live_lab.synth.base import FakeEngine
-from live_lab.synth.planner import plan_jobs
-from live_lab.synth.render import CLEAN_MANIFEST, render
 from live_lab.train import checkpoint
 from live_lab.train.loop import TrainConfig, train
-
-REGISTRY = """
-[[source]]
-name = "fake-tts"
-kind = "speech_synthetic"
-license = "MIT"
-origin = "teste"
-obtained_at = 2026-10-03
-
-[[source]]
-name = "ruido"
-kind = "noise"
-license = "CC0-1.0"
-origin = "teste"
-obtained_at = 2026-10-03
-path = "ruido"
-"""
-
-
-@pytest.fixture(scope="module")
-def manifest(tmp_path_factory: pytest.TempPathFactory) -> Path:
-    base = tmp_path_factory.mktemp("treino")
-    import numpy as np
-
-    from live_lab import audio_io
-
-    rng = np.random.default_rng(1)
-    for index in range(6):
-        noise = (0.1 * rng.standard_normal(32_000)).astype(np.float32)
-        audio_io.save(base / "ruido" / f"r{index}.wav", noise)
-    (base / "fontes.toml").write_text(REGISTRY, encoding="utf-8")
-    engine = FakeEngine(voice_count=4)
-    render(plan_jobs(60, engine.voices(), seed=2), engine, base / "clean")
-    registry = load_registry(base / "fontes.toml")
-    config = PrepConfig([base / "clean" / CLEAN_MANIFEST], base / "ds", seed=3, copies=1, val_fraction=0.25)
-    report.write_outputs(run(config, registry), registry, config)
-    return base / "ds" / "manifest.jsonl"
 
 
 def config(manifest: Path, out: Path, epochs: int) -> TrainConfig:

@@ -42,15 +42,15 @@ Ordem de execução: US5 primeiro (destrava a gravação real do PO), depois US2
 
 ## Phase 5: User Story 4 - Exportar (P2)
 
-- [ ] T018 [US4] Implementar exportação FP32 → INT8, equivalência e pacote em training/live_lab/export.py
-- [ ] T019 [US4] Implementar medição (tamanho, latência 1 thread, memória) em training/live_lab/bench.py
-- [ ] T020 [US4] Testes de exportação com modelo pequeno (equivalência, entrada = áudio bruto) em training/tests/test_export.py
-- [ ] T021 [US4] Comando `export` em training/live_lab/cli_model.py
+- [X] T018 [US4] Implementar exportação FP32 → INT8, equivalência e pacote em training/live_lab/export.py
+- [X] T019 [US4] Implementar medição (tamanho, latência 1 thread, memória) em training/live_lab/bench.py
+- [X] T020 [US4] Testes de exportação com modelo pequeno (equivalência, entrada = áudio bruto) em training/tests/test_export.py
+- [X] T021 [US4] Comando `export` em training/live_lab/cli_model.py
 
 ## Phase 6: User Story 3 - Avaliar (P1)
 
-- [ ] T022 [US3] Implementar avaliação via ONNX Runtime e relatório em training/live_lab/evaluate.py
-- [ ] T023 [US3] Comando `evaluate` (recusa voz real na nuvem) e teste ponta a ponta em training/tests/test_evaluate.py
+- [X] T022 [US3] Implementar avaliação via ONNX Runtime e relatório em training/live_lab/evaluate.py
+- [X] T023 [US3] Comando `evaluate` (recusa voz real na nuvem) e teste ponta a ponta em training/tests/test_evaluate.py
 
 ## Phase 7: Polish
 
