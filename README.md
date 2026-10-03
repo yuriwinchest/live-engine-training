@@ -57,9 +57,9 @@ As decisões e o que foi descartado estão em [`docs/ARQUITETURA.md`](docs/ARQUI
 
 ```text
 live-engine-training/
-├── training/        # Laboratório de ML (Python · PyTorch · torchaudio)
-│   ├── scripts/     # Preparação de dados e augmentation (ruído, SNR, stretch, pitch)
-│   ├── live/        # Pacote: vocabulário, gramática, modelo, treino, avaliação
+├── training/        # Laboratório de ML (Python 3.12 · uv)
+│   ├── live_lab/    # Pacote: vocabulário, gramática, síntese de voz, ruído, preparação de dados
+│   ├── tests/       # pytest — inclui varredura exaustiva dos 10 000 números
 │   └── data/        # Datasets locais (fora do Git)
 ├── android/         # SDK de inferência (Kotlin · ONNX Runtime)
 ├── docs/            # Arquitetura e decisões
@@ -72,8 +72,9 @@ live-engine-training/
 
 - [x] Diagnóstico em campo dos motores prontos
 - [x] Arquitetura: Push-to-Talk + sequência CTC + gramática
-- [ ] Vocabulário e gramática de números (0–9999, por extenso e dígito a dígito)
-- [ ] Laboratório de dados: injeção de ruído com SNR controlado, *time stretch*, *pitch shift*
+- [x] Vocabulário e gramática de números (0–9999, por extenso e dígito a dígito) — verificada exaustivamente
+- [x] Laboratório de dados: voz sintética licenciada, ruído com SNR controlado, *time stretch*, *pitch shift*
+- [ ] Primeiro dataset gerado e gravação real de prova para o conjunto de teste
 - [ ] Modelo acústico compacto + treino + avaliação por número inteiro
 - [ ] Exportação ONNX com espectrograma embutido
 - [ ] SDK Android: `LiveEngine.start()` · `onNumber(Int, instante)`

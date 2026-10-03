@@ -33,6 +33,8 @@ training/data/
 *.mp3
 *.ogg
 *.m4a
+*.opus
+*.webm
 training/runs/
 training/checkpoints/
 *.pt

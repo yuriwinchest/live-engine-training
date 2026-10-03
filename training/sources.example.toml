@@ -1,0 +1,43 @@
+# Registro de fontes do L.I.V.E. — modelo. Copie para training/data/fontes.toml (fora do Git) e ajuste.
+# Licenças aceitas: CC0-1.0, CC-BY-4.0, Apache-2.0, MIT, public-domain, own-recording-consented.
+# Qualquer outra (inclusive CC-BY-NC) é recusada: o modelo treinado tem uso comercial previsto.
+# Caminhos relativos partem da pasta deste arquivo; nunca apontar para dentro do repositório versionado.
+
+[[source]]
+name = "kokoro-82m"
+kind = "speech_synthetic"
+license = "Apache-2.0"
+origin = "https://github.com/hexgrad/kokoro"
+obtained_at = 2026-10-03
+
+[[source]]
+name = "chatterbox-multilingual"
+kind = "speech_synthetic"
+license = "MIT"
+origin = "https://github.com/resemble-ai/chatterbox"
+obtained_at = 2026-10-03
+
+[[source]]
+name = "parler-tts-multilingual"
+kind = "speech_synthetic"
+license = "Apache-2.0"
+origin = "https://huggingface.co/parler-tts/parler-tts-mini-multilingual-v1.1"
+obtained_at = 2026-10-03
+
+[[source]]
+name = "musan-noise"
+kind = "noise"
+license = "CC-BY-4.0"
+origin = "https://www.openslr.org/17/"
+obtained_at = 2026-10-03
+path = "D:/datasets/musan/noise"
+attribution = "MUSAN: A Music, Speech, and Noise Corpus — D. Snyder, G. Chen, D. Povey (2015), arXiv:1510.08484"
+
+# Gravação real do PO: só na máquina local, só para teste. consent_ref = UUID do termo assinado.
+# [[source]]
+# name = "gravacao-po-2026-10"
+# kind = "speech_real"
+# license = "own-recording-consented"
+# origin = "gravação na rua, microfone do celular"
+# obtained_at = 2026-10-10
+# consent_ref = "00000000-0000-0000-0000-000000000000"
