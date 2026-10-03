@@ -84,7 +84,8 @@ def prefix_beam_search(
                 source = p_blank if node != 0 and token == trie.token_into[node] else total
                 target = nxt.setdefault(child, [NEG_INF, NEG_INF])
                 target[1] = _add(target[1], source + frame[token])
-        ranked = sorted(nxt.items(), key=lambda item: _add(*item[1]), reverse=True)[:beam_width]
+        # Empate desempata pelo índice do nó: o SDK Android faz igual, e as decisões batem bit a bit.
+        ranked = sorted(nxt.items(), key=lambda item: (-_add(*item[1]), item[0]))[:beam_width]
         beams = {node: (pb, pt) for node, (pb, pt) in ranked}
     return {node: _add(pb, pt) for node, (pb, pt) in beams.items()}
 

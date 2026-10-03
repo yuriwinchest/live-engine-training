@@ -88,11 +88,17 @@ def summarize(
     }
 
 
+DISABLED: float = -1e9  # limiar desligado; JSON padrão não tem -Infinity (o Android não leria)
+
+
 def vars_of(thresholds: Thresholds) -> dict[str, float]:
+    def finite(value: float) -> float:
+        return value if value > DISABLED else DISABLED
+
     return {
-        "min_posterior": thresholds.min_posterior,
-        "min_margin": thresholds.min_margin,
-        "min_adherence": thresholds.min_adherence,
+        "min_posterior": finite(thresholds.min_posterior),
+        "min_margin": finite(thresholds.min_margin),
+        "min_adherence": finite(thresholds.min_adherence),
     }
 
 
