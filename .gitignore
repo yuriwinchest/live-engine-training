@@ -1,0 +1,52 @@
+# Operação local dos agentes (cita infraestrutura e caminhos da máquina)
+AGENTS.md
+CLAUDE.md
+HANDOFF.md
+TONE-INVARIANTS.md
+.ai-memory.toml
+docs/handoff/
+.agents/
+.claude/
+scripts/specify.ps1
+scripts/verificar-handoff.ps1
+
+# Segredos
+.env
+.env.*
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Dados e artefatos de treino (áudio de pessoas nunca entra no Git)
+training/data/
+*.wav
+*.flac
+*.mp3
+*.ogg
+*.m4a
+training/runs/
+training/checkpoints/
+*.pt
+*.ckpt
+*.onnx
+*.tflite
+
+# Android
+android/.gradle/
+android/build/
+android/**/build/
+android/local.properties
+.idea/
+*.iml
+
+# Sistema
+.DS_Store
+Thumbs.db
