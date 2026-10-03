@@ -112,12 +112,17 @@ def build_package(
     root = manifest.parent
     clips = [audio_io.load(root / e.audio) for e in val[:300]]
 
+    def step(number: int, text: str) -> None:
+        print(f"[etapa {number}/6] {text}", file=sys.stderr, flush=True)
+
     out.mkdir(parents=True, exist_ok=True)
+    step(1, "exportando ONNX FP32 e conferindo com o PyTorch")
     model = load_model(checkpoint_path)
     fp32, int8 = out / "model.fp32.onnx", out / "model.int8.onnx"
     export_fp32(model, fp32)
     parity = _parity(model, fp32, clips[:10])
     print(f"FP32 ONNX vs PyTorch: diferença máxima {parity:.2e}", file=sys.stderr)
+    step(2, "quantizando para INT8 (calibração com 300 clipes)")
     quantize(fp32, int8, clips)
 
     grammar = Grammar.build()
@@ -125,14 +130,18 @@ def build_package(
     (out / "grammar.json").write_text(json.dumps(trie_dict, separators=(",", ":")), encoding="utf-8")
     trie = CompiledTrie(trie_dict)
     calib_set, report_set = halves(val)
-    print(f"decodificando {len(val)} clipes de validação (FP32 e INT8)…", file=sys.stderr)
-    int8_calib = decisions_for(int8, calib_set, root, trie)
+    step(3, f"INT8 na metade de calibração ({len(calib_set)} clipes)")
+    int8_calib = decisions_for(int8, calib_set, root, trie, "INT8 calibração")
     calibration = calibrate(int8_calib, [e.number for e in calib_set], min_accuracy)
-    int8_report = summarize(
-        report_set, decisions_for(int8, report_set, root, trie), calibration.thresholds, True
+    step(4, f"INT8 na metade de medição ({len(report_set)} clipes)")
+    int8_decisions = decisions_for(int8, report_set, root, trie, "INT8 medição")
+    int8_report = summarize(report_set, int8_decisions, calibration.thresholds, True)
+    int8_raw = summarize(report_set, int8_decisions, ACCEPT_ALL, True)
+    step(5, f"FP32 na metade de medição, para medir a perda da quantização ({len(report_set)} clipes)")
+    fp32_raw = summarize(
+        report_set, decisions_for(fp32, report_set, root, trie, "FP32 medição"), ACCEPT_ALL, True
     )
-    fp32_raw = summarize(report_set, decisions_for(fp32, report_set, root, trie), ACCEPT_ALL, True)
-    int8_raw = summarize(report_set, decisions_for(int8, report_set, root, trie), ACCEPT_ALL, True)
+    step(6, "medindo tamanho, tempo e memória")
     measured = bench.measure(int8)
 
     meta: dict[str, Any] = {

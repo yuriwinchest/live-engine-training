@@ -19,6 +19,7 @@ from live_lab.grammar import Grammar
 from live_lab.ingest_real import refuse_cloud
 from live_lab.manifest import Example, Split, read_manifest
 from live_lab.metrics import Outcome, by_group, rates
+from live_lab.progress import Progress
 from live_lab.runtime import open_session, recognize_all
 from live_lab.seeding import stable_hash
 
@@ -48,9 +49,16 @@ def halves(examples: Sequence[Example]) -> tuple[list[Example], list[Example]]:
     return first, second
 
 
-def decisions_for(model: Path, examples: Sequence[Example], root: Path, trie: CompiledTrie) -> list[Decision]:
+def decisions_for(
+    model: Path, examples: Sequence[Example], root: Path, trie: CompiledTrie, label: str = "decodificando"
+) -> list[Decision]:
     session = open_session(model)
-    return recognize_all(session, [audio_io.load(root / e.audio) for e in examples], trie)
+    progress = Progress(len(examples), label)
+    decisions: list[Decision] = []
+    for example in examples:
+        decisions.append(recognize_all(session, [audio_io.load(root / example.audio)], trie)[0])
+        progress.tick()
+    return decisions
 
 
 def summarize(
