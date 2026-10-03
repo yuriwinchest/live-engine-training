@@ -9,7 +9,7 @@ import argparse
 import sys
 from collections.abc import Sequence
 
-from live_lab import cli_data, cli_grammar
+from live_lab import cli_data, cli_grammar, cli_model
 
 EXIT_INVALID = 2
 
@@ -19,6 +19,7 @@ def build_parser() -> argparse.ArgumentParser:
     commands = parser.add_subparsers(dest="command", required=True)
     cli_grammar.register(commands)
     cli_data.register(commands)
+    cli_model.register(commands)
     return parser
 
 

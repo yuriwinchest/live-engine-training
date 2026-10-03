@@ -33,6 +33,15 @@ obtained_at = 2026-10-03
 path = "D:/datasets/musan/noise"
 attribution = "MUSAN: A Music, Speech, and Noise Corpus — D. Snyder, G. Chen, D. Povey (2015), arXiv:1510.08484"
 
+[[source]]
+name = "musan-speech"
+kind = "distractor"
+license = "CC-BY-4.0"
+origin = "https://www.openslr.org/17/"
+obtained_at = 2026-10-03
+path = "D:/datasets/musan/speech"
+attribution = "MUSAN: A Music, Speech, and Noise Corpus — D. Snyder, G. Chen, D. Povey (2015), arXiv:1510.08484"
+
 # Gravação real do PO: só na máquina local, só para teste. consent_ref = UUID do termo assinado.
 # [[source]]
 # name = "gravacao-po-2026-10"

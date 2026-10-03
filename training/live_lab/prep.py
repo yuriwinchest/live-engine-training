@@ -16,6 +16,7 @@ import numpy as np
 
 from live_lab import audio_io, augment
 from live_lab.grammar import Grammar
+from live_lab.holdout import holdout_key, is_reserved
 from live_lab.ingest_real import refuse_cloud
 from live_lab.manifest import CleanClip, Example, ManifestHeader, Mode, SnrLevel, Split, read_clips
 from live_lab.negatives import noise_only
@@ -79,6 +80,8 @@ def _noise_pools(registry: Registry, seed: int, val_fraction: float) -> dict[Spl
         if source.path is None:
             raise ValueError(f"fonte de ruído {source.name!r} sem 'path'")
         for file in audio_io.list_audio(source.path):
+            if is_reserved(holdout_key(source.path, file)):
+                continue  # reservado para a gravação real do PO: nunca entra no treino (US5 da 002)
             key = f"{source.name}/{file.relative_to(source.path).as_posix()}"
             pools[split_of_file(key, seed, val_fraction)].append((source.name, file))
     return pools
