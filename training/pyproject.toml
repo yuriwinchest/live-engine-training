@@ -11,6 +11,16 @@ dependencies = [
     "soundfile>=0.12",
 ]
 
+[project.optional-dependencies]
+# Treino, exportação e avaliação do modelo (feature 002). No Windows o torch do PyPI é a build de CPU.
+train = [
+    "torch>=2.4",
+    "onnx>=1.17",
+    "onnxscript>=0.2",
+    "onnxruntime>=1.20",
+    "psutil>=6",
+]
+
 [project.scripts]
 live-lab = "live_lab.cli:main"
 

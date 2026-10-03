@@ -10,7 +10,7 @@ Ordem de execução: US5 primeiro (destrava a gravação real do PO), depois US2
 
 ## Phase 1: Setup
 
-- [ ] T001 Adicionar extra `train` (torch, onnx, onnxscript, onnxruntime, psutil) em training/pyproject.toml e atualizar uv.lock
+- [X] T001 Adicionar extra `train` (torch, onnx, onnxscript, onnxruntime, psutil) em training/pyproject.toml e atualizar uv.lock
 - [X] T002 [P] Registrar `musan-speech` (kind `distractor`, CC-BY-4.0) em training/sources.example.toml
 
 ## Phase 2: User Story 5 - Ruído reservado (P2, executada primeiro) 🎯
@@ -33,12 +33,12 @@ Ordem de execução: US5 primeiro (destrava a gravação real do PO), depois US2
 
 ## Phase 4: User Story 1 - Treinar (P1)
 
-- [ ] T012 [P] [US1] Testes do front-end (forma, paridade com STFT de referência) e da rede (forma de saída, parâmetros) em training/tests/test_frontend.py e training/tests/test_network.py
-- [ ] T013 [US1] Implementar front-end log-Mel exportável em training/live_lab/model/frontend.py
-- [ ] T014 [US1] Implementar rede separável e SpecAugment em training/live_lab/model/network.py e training/live_lab/model/specaugment.py
-- [ ] T015 [US1] Implementar dados, laço de treino e checkpoints em training/live_lab/train/data.py, loop.py, checkpoint.py
-- [ ] T016 [US1] Teste de fumaça: treino curto em CPU com dataset falso, interrupção e retomada, em training/tests/test_train_smoke.py
-- [ ] T017 [US1] Comando `train` em training/live_lab/cli_model.py e notebook training/colab/treino.ipynb
+- [X] T012 [P] [US1] Testes do front-end (forma, paridade com STFT de referência) e da rede (forma de saída, parâmetros) em training/tests/test_frontend.py e training/tests/test_network.py
+- [X] T013 [US1] Implementar front-end log-Mel exportável em training/live_lab/model/frontend.py
+- [X] T014 [US1] Implementar rede separável e SpecAugment em training/live_lab/model/network.py e training/live_lab/model/specaugment.py
+- [X] T015 [US1] Implementar dados, laço de treino e checkpoints em training/live_lab/train/data.py, loop.py, checkpoint.py
+- [X] T016 [US1] Teste de fumaça: treino curto em CPU com dataset falso, interrupção e retomada, em training/tests/test_train_smoke.py
+- [X] T017 [US1] Comando `train` em training/live_lab/cli_model.py e notebook training/colab/treino.ipynb
 
 ## Phase 5: User Story 4 - Exportar (P2)
 
