@@ -31,7 +31,9 @@ class TtsEngine(Protocol):
 
     def voices(self) -> Sequence[Voice]: ...
 
-    def synthesize(self, text: str, voice: Voice) -> tuple[Audio, int]: ...
+    def synthesize(self, text: str, voice: Voice, speed: float = 1.0) -> tuple[Audio, int]:
+        """`speed` < 1 fala mais devagar; motores sem controle de velocidade podem ignorar."""
+        ...
 
 
 class FakeEngine:
@@ -47,9 +49,9 @@ class FakeEngine:
     def voices(self) -> Sequence[Voice]:
         return self._voices
 
-    def synthesize(self, text: str, voice: Voice) -> tuple[Audio, int]:
+    def synthesize(self, text: str, voice: Voice, speed: float = 1.0) -> tuple[Audio, int]:
         offset = 1.0 + 0.05 * self._voices.index(voice)
-        t = np.arange(int(0.18 * self.rate)) / self.rate
+        t = np.arange(int(0.25 / speed * self.rate)) / self.rate
         gap = np.zeros(int(0.05 * self.rate), dtype=np.float32)
         parts: list[Audio] = []
         for word in text.replace(",", " ").split():

@@ -53,3 +53,46 @@ def test_deterministic_and_round_trip(tmp_path: Path, jobs: list) -> None:  # ty
     write_jobs(path, jobs)
     assert read_jobs(path) == jobs
     assert len({job.id for job in jobs}) == len(jobs)
+
+
+def test_short_utterances_are_slower(jobs: list) -> None:  # type: ignore[type-arg]
+    """Feedback do PO: "uma" isolado saía atropelado; falas de 1–2 palavras vão mais devagar."""
+    from live_lab.synth.planner import LONG_SPEED, SHORT_SPEED
+
+    for job in jobs:
+        words = len(job.tokens) if job.tokens else len(job.text.split())
+        low, high = SHORT_SPEED if words <= 2 else LONG_SPEED
+        assert low <= job.speed <= high, (job.text, job.speed)
+
+
+def test_render_retries_rushed_speech(tmp_path: Path) -> None:
+    import numpy as np
+
+    from live_lab import audio_io
+    from live_lab.manifest import read_clips
+    from live_lab.synth.base import Voice
+    from live_lab.synth.render import MIN_SECONDS_PER_WORD, render
+
+    class Rushing:
+        name, license = "rushing", "MIT"
+
+        def __init__(self) -> None:
+            self.speeds: list[float] = []
+
+        def voices(self) -> list[Voice]:
+            return [Voice("v", "spk-v")]
+
+        def synthesize(self, text: str, voice: Voice, speed: float = 1.0) -> tuple[np.ndarray, int]:
+            self.speeds.append(speed)
+            seconds = 0.15 / speed  # rápido demais até desacelerar bastante
+            t = np.arange(int(seconds * 16_000)) / 16_000
+            return (0.5 * np.sin(2 * np.pi * 300 * t)).astype(np.float32), 16_000
+
+    job = plan_jobs(1, [Voice("v", "spk-v")], seed=1)[0]
+    single = type(job)(job.id, 1, ("uma",), Mode.DIGITS, "uma", "v", "spk-v", 0.8)
+    engine = Rushing()
+    render([single], engine, tmp_path)
+    # 0,8 → 0,19 s (atropelado) → 0,64 → 0,23 s (atropelado) → 0,512 → 0,29 s (aceito)
+    assert engine.speeds == pytest.approx([0.8, 0.64, 0.512])
+    clip = next(read_clips(tmp_path / "clean.jsonl"))
+    assert audio_io.duration(audio_io.load(tmp_path / clip.audio)) >= MIN_SECONDS_PER_WORD

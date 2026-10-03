@@ -14,12 +14,15 @@ import numpy as np
 
 from live_lab import audio_io, dsp
 from live_lab.manifest import CleanClip, append_clip, read_clips
-from live_lab.synth.base import TtsEngine
+from live_lab.synth.base import TtsEngine, Voice
 from live_lab.synth.planner import SynthJob
 
 CLEAN_MANIFEST: Final = "clean.jsonl"
 TRIM_TOP_DB: Final = 40
 TARGET_PEAK: Final = 0.9
+MIN_SECONDS_PER_WORD: Final = 0.28  # abaixo disso a fala sai atropelada (PO, 2026-10-03)
+SLOWER: Final = 0.8
+RETRIES: Final = 2
 
 
 def _normalize(signal: audio_io.Audio) -> audio_io.Audio:
@@ -28,6 +31,19 @@ def _normalize(signal: audio_io.Audio) -> audio_io.Audio:
     if peak == 0.0:
         return np.asarray(trimmed, dtype=np.float32)
     return np.asarray(trimmed * (TARGET_PEAK / peak), dtype=np.float32)
+
+
+def _synthesize_paced(engine: TtsEngine, job: SynthJob, voice: Voice) -> audio_io.Audio:
+    """Gera e, se a fala sair rápida demais para o número de palavras, gera de novo mais devagar."""
+    speed = job.speed
+    words = max(1, len(job.tokens))
+    for attempt in range(RETRIES + 1):
+        signal, rate = engine.synthesize(job.text, voice, speed)
+        clip = _normalize(audio_io.resample(audio_io.to_mono(signal), rate))
+        if not job.tokens or audio_io.duration(clip) / words >= MIN_SECONDS_PER_WORD or attempt == RETRIES:
+            return clip
+        speed *= SLOWER
+    return clip
 
 
 def render(jobs: Sequence[SynthJob], engine: TtsEngine, out_dir: Path) -> int:
@@ -42,8 +58,7 @@ def render(jobs: Sequence[SynthJob], engine: TtsEngine, out_dir: Path) -> int:
         voice = voices.get(job.voice_id)
         if voice is None:
             raise ValueError(f"voz {job.voice_id!r} não existe no motor {engine.name!r}")
-        signal, rate = engine.synthesize(job.text, voice)
-        clip_audio = _normalize(audio_io.resample(audio_io.to_mono(signal), rate))
+        clip_audio = _synthesize_paced(engine, job, voice)
         relative = f"audio/{job.id}.wav"
         audio_io.save(out_dir / relative, clip_audio)
         append_clip(

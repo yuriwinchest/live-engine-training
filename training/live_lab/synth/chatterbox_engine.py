@@ -34,6 +34,7 @@ class ChatterboxEngine:
     def voices(self) -> Sequence[Voice]:
         return self._voices
 
-    def synthesize(self, text: str, voice: Voice) -> tuple[Audio, int]:
+    def synthesize(self, text: str, voice: Voice, speed: float = 1.0) -> tuple[Audio, int]:
+        # sem controle de velocidade no motor: o time stretch da preparação cobre a variação
         wav = self._model.generate(text, language_id="pt", audio_prompt_path=str(self._paths[voice.voice_id]))
         return np.asarray(wav.detach().cpu().numpy(), dtype=np.float32).reshape(-1), int(self._model.sr)

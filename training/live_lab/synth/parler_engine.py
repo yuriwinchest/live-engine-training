@@ -45,7 +45,8 @@ class ParlerEngine:
     def voices(self) -> Sequence[Voice]:
         return self._voices
 
-    def synthesize(self, text: str, voice: Voice) -> tuple[Audio, int]:
+    def synthesize(self, text: str, voice: Voice, speed: float = 1.0) -> tuple[Audio, int]:
+        # sem controle de velocidade no motor: o time stretch da preparação cobre a variação
         description = self._description_tokenizer(voice.voice_id, return_tensors="pt").input_ids
         prompt = self._prompt_tokenizer(text, return_tensors="pt").input_ids
         generation = self._model.generate(

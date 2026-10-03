@@ -26,6 +26,8 @@ from live_lab.vocab import WORDS
 
 MIN_WORD_SHARE: Final = 0.015  # margem: a validação leva vozes inteiras e reduz a fatia do treino
 DISTRACTOR_SHARE: Final = 0.06
+SHORT_SPEED: Final = (0.70, 0.85)
+LONG_SPEED: Final = (0.85, 1.00)
 
 # Falas comuns na largada, sem nenhuma palavra do vocabulário (nem "e"): ensinam o "não entendi".
 DISTRACTOR_PHRASES: Final[tuple[str, ...]] = (
@@ -63,6 +65,7 @@ class SynthJob:
     text: str
     voice_id: str
     speaker: str
+    speed: float = 1.0
 
 
 @cache
@@ -88,11 +91,17 @@ def _text_for(form: Form, mode: Mode, rng: np.random.Generator) -> str:
     return " ".join(form)
 
 
+def speed_for(words: int, rng: np.random.Generator) -> float:
+    """Falas curtas mais devagar: o Kokoro "atropela" palavra isolada ("uma" saía ininteligível, PO)."""
+    low, high = SHORT_SPEED if words <= 2 else LONG_SPEED
+    return round(float(rng.uniform(low, high)), 3)
+
+
 def _job(
-    seed: int, ordinal: int, number: int | None, form: Form, mode: Mode, voice: Voice, text: str
+    seed: int, ordinal: int, number: int | None, form: Form, mode: Mode, voice: Voice, text: str, speed: float
 ) -> SynthJob:
-    job_id = str(stable_uuid(seed, "job", ordinal, voice.voice_id, " ".join(form), text))
-    return SynthJob(job_id, number, form, mode, text, voice.voice_id, voice.speaker)
+    job_id = str(stable_uuid(seed, "job", ordinal, voice.voice_id, " ".join(form), text, speed))
+    return SynthJob(job_id, number, form, mode, text, voice.voice_id, voice.speaker, speed)
 
 
 def plan_jobs(count: int, voices: Sequence[Voice], seed: int) -> list[SynthJob]:
@@ -106,7 +115,8 @@ def plan_jobs(count: int, voices: Sequence[Voice], seed: int) -> list[SynthJob]:
     def add(number: int | None, form: Form, mode: Mode, rng: np.random.Generator) -> None:
         voice = voices[len(jobs) % len(voices)]
         text = _text_for(form, mode, rng) if form else str(rng.choice(DISTRACTOR_PHRASES))
-        jobs.append(_job(seed, len(jobs), number, form, mode, voice, text))
+        speed = speed_for(len(form) if form else len(text.split()), rng)
+        jobs.append(_job(seed, len(jobs), number, form, mode, voice, text, speed))
         word_counts.update(form)
 
     distractors = math.ceil(count * DISTRACTOR_SHARE)

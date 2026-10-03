@@ -31,9 +31,9 @@ class KokoroEngine:
     def voices(self) -> Sequence[Voice]:
         return self._voices
 
-    def synthesize(self, text: str, voice: Voice) -> tuple[Audio, int]:
+    def synthesize(self, text: str, voice: Voice, speed: float = 1.0) -> tuple[Audio, int]:
         chunks: list[Audio] = []
-        for result in self._pipeline(text, voice=voice.voice_id, speed=1.0):
+        for result in self._pipeline(text, voice=voice.voice_id, speed=speed):
             audio = result.audio if hasattr(result, "audio") else result[2]
             if audio is not None:
                 chunks.append(np.asarray(audio.detach().cpu().numpy(), dtype=np.float32).reshape(-1))
