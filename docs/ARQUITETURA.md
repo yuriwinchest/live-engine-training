@@ -59,6 +59,16 @@ se uma medição no aparelho justificar. Sem C++/JNI próprio enquanto não houv
 Python **3.11 ou 3.12** em ambiente virtual próprio (o 3.14 da máquina pode não ter todas as ferramentas de
 exportação). Dependências fixadas em `requirements.txt`.
 
+## ADR-006 — O que é público e o que não é
+
+**Data:** 2026-10-03 · **Decisão:** Yuri (PO)
+
+Código e arquitetura: públicos, sob **PolyForm Noncommercial 1.0.0** (uso não comercial livre; comercial só com
+licença do autor). **Nunca publicados:** pesos/modelos treinados (`.pt`, `.ckpt`, `.onnx`, `.tflite`), datasets,
+clipes de voz e listas de locutores. São o valor do motor e, no caso da voz, dado pessoal. O `.gitignore` bloqueia
+esses formatos; um modelo para o app LGDA é entregue por canal privado, nunca por este repositório.
+Contribuições de terceiros só com termo de cessão (CLA), para preservar o licenciamento comercial.
+
 ---
 
 ## Critério de pronto (a medir, não a prometer)

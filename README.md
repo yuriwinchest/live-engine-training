@@ -6,6 +6,7 @@
 ![offline](https://img.shields.io/badge/edge%20AI-100%25%20offline-2ea44f)
 ![python](https://img.shields.io/badge/lab-Python%203.11%2B%20%C2%B7%20PyTorch-3776ab)
 ![android](https://img.shields.io/badge/SDK-Kotlin%20%C2%B7%20ONNX%20Runtime-7f52ff)
+![license](https://img.shields.io/badge/licen%C3%A7a-PolyForm%20Noncommercial%201.0.0-lightgrey)
 
 O **L.I.V.E.** é o motor de reconhecimento de voz do **LGDA**, o app de cronometragem de corridas de rua da
 plataforma **Largada Brasil**. O fiscal na linha de chegada fala o número de peito do atleta; o motor devolve o
@@ -106,5 +107,15 @@ do autor.
 
 ## 📄 Licença
 
-© 2026 Yuri Winchester. **Todos os direitos reservados.** O código está público para leitura e avaliação; uso,
-cópia ou redistribuição exigem autorização do autor. Veja [`LICENSE`](LICENSE).
+© 2026 Yuri Winchester · [**PolyForm Noncommercial 1.0.0**](LICENSE)
+
+| ✅ Liberado | ❌ Exige licença comercial |
+|---|---|
+| Estudo, pesquisa, testes e projetos pessoais | Usar em produto, serviço ou operação com fins lucrativos |
+| Escolas, ONGs, órgãos públicos e pesquisa pública | Revender, embutir em app comercial ou oferecer como serviço |
+
+**Licença comercial:** abra uma [issue](https://github.com/yuriwinchest/live-engine-training/issues) com o
+título *"Licença comercial"* ou fale pelo perfil [@yuriwinchest](https://github.com/yuriwinchest).
+
+> O repositório publica o **código e a arquitetura**. Os **modelos treinados** e os **dados de voz** não fazem parte
+> dele e não são cobertos por esta licença.

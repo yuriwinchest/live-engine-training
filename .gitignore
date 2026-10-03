@@ -25,7 +25,8 @@ venv/
 .mypy_cache/
 .ruff_cache/
 
-# Dados e artefatos de treino (áudio de pessoas nunca entra no Git)
+# Dados e artefatos de treino: NUNCA públicos (ADR-006 em docs/ARQUITETURA.md).
+# Modelo treinado e áudio são o valor do motor; voz é dado pessoal.
 training/data/
 *.wav
 *.flac
@@ -35,6 +36,10 @@ training/data/
 training/runs/
 training/checkpoints/
 *.pt
+*.pth
+*.safetensors
+*.npz
+training/**/*.bin
 *.ckpt
 *.onnx
 *.tflite
